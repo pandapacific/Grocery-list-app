@@ -1,0 +1,39 @@
+{
+    "items" : [
+        {
+            "id": 1,
+            "checked": false,
+            "items": "tomatoes!"
+        },
+        {
+            "id": 2,
+            "checked": false,
+            "items": "Meat"
+        },
+        {
+            "id": 3,
+            "checked": false,
+            "items": "Biscuits"
+        },
+        {
+            "id": 4,
+            "checked": false,
+            "items": "Ponmo"
+        },
+        {
+            "id": 5,
+            "checked": false,
+            "items": "Beans"
+        },
+        {
+            "id": 6,
+            "checked": false,
+            "items": "rice"
+        },
+        {
+            "id": 7,
+            "checked": false,
+            "items": "yoghurt"
+        }
+    ]
+}
