@@ -11,20 +11,26 @@ function App() {
   const [items, setItems] = useState([] );
   const [newItem, setNewItem] = useState('');
   const [search, setSearch] = useState('');
-  const API_URL = "http://localhost:5173/";
+  const [fetchError, setFetchError] = useState(null)
+  const API_URL = "http://localhost:3500/items";
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      const FetchItems = async () => {
+    const FetchItems = async () => {
+      try {
         const response = await fetch(API_URL);
+        if (!response.ok) throw Error('Did not recieve expected data.');
         const fetchedItems = await response.json();
-        console.log(fetchedItems);
-        setItems(fetchedItems);
+        setItems(fetchedItems);   
+      } catch (err) {
+        setFetchError(err.message);
+      }finally{
+        setIsLoading(false)
       }
-      (async () => await FetchItems())()
-    } catch (err) {
-      console.log (err.stack);
     }
+    setTimeout(() => {
+      FetchItems()
+    }, 2000)
   }, [])
 
   const addItem = (item) => {
@@ -68,17 +74,25 @@ function App() {
        setSearch = {setSearch}
         />
 
-      <Content 
-      items = {
-        items.filter((item) => {
-          return (item.items).toLowerCase().includes(search.toLowerCase());
-        })
-      }
-      setItems = {setItems}
-      handleCheck = {handleCheck}
-      handleDelete = {handleDelete}
-      />
-
+      <main>
+        {fetchError &&
+        <p style={{color: "red"}}>{`Error: ${fetchError}`}</p> 
+        }
+        {isLoading &&
+        <p style={{color: "blue"}}>{"Loading..."}</p> 
+        }
+        {!fetchError && !isLoading && <Content 
+        items = {
+          items.filter((item) => {
+            return (item.items).toLowerCase().includes(search.toLowerCase());
+          })
+        }
+        setItems = {setItems}
+        handleCheck = {handleCheck}
+        handleDelete = {handleDelete}
+        />}
+      </main>
+      
       <Footer 
       length = {items.length}
       />
