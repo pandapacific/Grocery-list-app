@@ -4,6 +4,7 @@ import AddItem from './addItem';
 import Content from './Content';
 import Footer from './Footer';
 import {useState, useEffect} from 'react';
+import apiRequest from './apiRequest.js';
 
 
 
@@ -15,13 +16,16 @@ function App() {
   const API_URL = "http://localhost:3500/items";
   const [isLoading, setIsLoading] = useState(true);
 
+  // Read functionality
   useEffect(() => {
     const FetchItems = async () => {
       try {
         const response = await fetch(API_URL);
         if (!response.ok) throw Error('Did not recieve expected data.');
         const fetchedItems = await response.json();
-        setItems(fetchedItems);   
+        // Normalize id types to numbers
+        const normalized = fetchedItems.map(item => ({ ...item, id: Number(item.id) }));
+        setItems(normalized);     
       } catch (err) {
         setFetchError(err.message);
       }finally{
@@ -30,24 +34,65 @@ function App() {
     }
     setTimeout(() => {
       FetchItems()
-    }, 2000)
+    }, 0)
   }, [])
 
-  const addItem = (item) => {
-    const id = items.length ? items[items.length-1].id +1 :  1;
-    const myNewItem = {id: id, checked: false, items: item};
+  // Create functionality
+  const addItem = async (item) => {
+    // const id = items.length ? (items[(items.length)-1].id) + 1 :  1;
+    const id = items.length ? Math.max(...items.map(i => i.id)) + 1 : 1;
+    const myNewItem = {id: nextId, checked: false, items: item};
     const listItems = [...items, myNewItem];
     setItems(listItems);
+
+    const url = API_URL;
+    const optionsObj = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(myNewItem), 
+    }
+    const result = await apiRequest(url, optionsObj);
+    if (result) setFetchError(result);
   }
 
-  const handleCheck = (id) => {
-    const listItems = items.map((item) => item.id === id ? {...item, checked: !item.checked} : item);
+  // Update functionality
+  const handleCheck = async (id) => {
+    // Convert id to number if it's coming as string
+    const numId = Number(id);
+    
+    const listItems = items.map((item) => 
+      Number(item.id) === numId ? {...item, checked: !item.checked} : item
+    );
     setItems(listItems);
+
+    const myItem = listItems.find((item) => item.id === numId);
+    const url = `${API_URL}/${numId}`;
+    
+    const optionsObj = {
+      method: 'PATCH',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({checked: myItem.checked}), 
+    }
+    const result = await apiRequest(url, optionsObj);
+    if (result) setFetchError(result);
   }
 
-  const handleDelete = (id) => {
-    const listItems = items.filter((item) => item.id !== id);
+  // Delete functionality
+  const handleDelete = async (id) => {
+    const numId = Number(id);
+    const listItems = items.filter((item) => Number(item.id) !== numId);
     setItems(listItems);
+
+    const url = `${API_URL}/${numId}`;
+    const optionsObj = {
+      method: 'DELETE'
+    };
+    const result = await apiRequest(url, optionsObj);
+    if (result) setFetchError(result);
   }
 
   const handleSubmit = (e) => {
