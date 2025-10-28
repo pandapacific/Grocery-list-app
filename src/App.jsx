@@ -9,7 +9,7 @@ import apiRequest from './apiRequest.js';
 
 
 function App() {
-  const [items, setItems] = useState([] );
+  const [items, setItems] = useState([]);
   const [newItem, setNewItem] = useState('');
   const [search, setSearch] = useState('');
   const [fetchError, setFetchError] = useState(null)
@@ -23,7 +23,7 @@ function App() {
         const response = await fetch(API_URL);
         if (!response.ok) throw Error('Did not recieve expected data.');
         const fetchedItems = await response.json();
-        // Normalize id types to numbers
+        // Failsafe: normalize id types to numbers
         const normalized = fetchedItems.map(item => ({ ...item, id: Number(item.id) }));
         setItems(normalized);     
       } catch (err) {
@@ -40,10 +40,11 @@ function App() {
   // Create functionality
   const addItem = async (item) => {
     // const id = items.length ? (items[(items.length)-1].id) + 1 :  1;
-    const id = items.length ? Math.max(...items.map(i => i.id)) + 1 : 1;
+    const nextId = items.length ? Math.max(...items.map(i => i.id)) + 1 : 1;
     const myNewItem = {id: nextId, checked: false, items: item};
     const listItems = [...items, myNewItem];
     setItems(listItems);
+    console.log(listItems);
 
     const url = API_URL;
     const optionsObj = {
@@ -106,7 +107,7 @@ function App() {
     <div className="App">
       <Header
       title = {"Grocery List"}
-       />
+      />
        
       <AddItem 
       newItem={newItem}
@@ -117,7 +118,7 @@ function App() {
       <SearchItem
        search = {search}
        setSearch = {setSearch}
-        />
+      />
 
       <main>
         {fetchError &&
@@ -143,7 +144,7 @@ function App() {
       />
 
     </div>
-   )
+  );
 }
 
 export default App

@@ -10,7 +10,7 @@ const Content = ({items, handleCheck, handleDelete}) => {
                     items = {items}
                     handleCheck = {handleCheck}
                     handleDelete = {handleDelete} 
-                    />
+                />
             ) : (
                 <div>
                     Your list is empty.
